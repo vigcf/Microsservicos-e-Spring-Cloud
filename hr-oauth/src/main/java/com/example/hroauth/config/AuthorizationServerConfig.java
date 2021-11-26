@@ -18,34 +18,30 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	private JwtAccessTokenConverter accessTokenConverter;
-	
+
 	@Autowired
 	private JwtTokenStore tokenStore;
-	
+
 	@Autowired
 	private AuthenticationManager authenticationManager;
-	
+
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		// TODO Auto-generated method stub
-		super.configure(security);
+		security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
 	}
 
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		// TODO Auto-generated method stub
-		super.configure(clients);
+		clients.inMemory().withClient("myappname123").secret(passwordEncoder.encode("myappsecret123"))
+				.scopes("read", "write").authorizedGrantTypes("password").accessTokenValiditySeconds(86400);
 	}
 
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-		// TODO Auto-generated method stub
-		super.configure(endpoints);
+		endpoints.authenticationManager(authenticationManager).tokenStore(tokenStore)
+				.accessTokenConverter(accessTokenConverter);
 	}
-	
-	
-
 }
